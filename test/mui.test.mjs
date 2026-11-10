@@ -62,3 +62,15 @@ test('buttons stay flat, as in Binom', () => {
 test('an unknown mode is refused', () => {
   assert.throws(() => createBinomTheme('sepia'), /unknown mode/);
 });
+
+test('tokens: literal values per theme, references resolved, ESM = CommonJS', async () => {
+  const { tokens } = await import('../dist/tokens.js');
+  assert.equal(tokens.light['color-accent'], '#384c2c');
+  assert.equal(tokens.dark['color-accent'], '#bfdf86');
+  assert.equal(tokens.light['radius-sm'], '6px');
+  assert.equal(tokens.dark['color-tint'], '#bfdf86'); // var(--color-accent) resolved in dark
+  assert.equal(tokens.light['menu-item-size'], '44px'); // var(--tap-size) resolved
+  for (const mode of ['light', 'dark']) assert.ok(Object.values(tokens[mode]).every((v) => !v.includes('{')), mode);
+  const cjs = createRequire(import.meta.url)('../dist/tokens.cjs');
+  assert.deepEqual(cjs.tokens, tokens);
+});

@@ -18,6 +18,12 @@
       "require": "./dist/mui.cjs",
       "default": "./dist/mui.js"
     },
+    "./tokens": {
+      "types": "./dist/tokens.d.ts",
+      "import": "./dist/tokens.js",
+      "require": "./dist/tokens.cjs",
+      "default": "./dist/tokens.js"
+    },
     "./tokens.json": "./tokens/tokens.json",
     "./package.json": "./package.json"
   },
@@ -46,6 +52,9 @@
     "*": {
       "mui": [
         "dist/mui.d.ts"
+      ],
+      "tokens": [
+        "dist/tokens.d.ts"
       ]
     }
   }

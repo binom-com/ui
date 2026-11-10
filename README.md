@@ -47,6 +47,13 @@ const theme = createTheme(createBinomTheme(mode)); // mode: 'light' | 'dark'
 
 Keep `data-theme` on `<html>` in step with `mode`, so parts outside MUI that read `tokens.css` match. The theme sets the palette (primary, error, background, text, divider), the font, corners, the 25 elevations from Binom shadows and flat buttons (`disableElevation`); pass your own overrides as a second argument, `createTheme(createBinomTheme(mode), { components })`, not by spreading (a spread replaces Binom's `components`); `secondary`, `info`, `success` and `warning` stay MUI's until Binom defines them. Works as ESM and CommonJS; under `moduleResolution: "node"` types resolve through `typesVersions`.
 
+**Values in code.** For a theme written in code (Material UI style overrides, canvas, charts):
+
+```js
+import { tokens } from '@binom/ui/tokens';
+tokens.light['color-accent']; // '#384c2c'
+```
+
 ## Dark theme
 
 Follows the system by default. An app setting forces a theme with `data-theme="light"` or `data-theme="dark"` on `<html>`.
