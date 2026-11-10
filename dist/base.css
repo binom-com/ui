@@ -160,8 +160,8 @@ input[type='range']::-moz-range-thumb { width: var(--range-knob); height: var(--
   textarea { font-size: max(16px, 1rem) !important; }
 }
 
-/* Touch. A finger has no hover (the build keeps `:hover` for a mouse, see hover-only-with-mouse.ts), so a press
-   shows itself: a row takes the hover tint, any other button or link dims while held. */
+/* Touch. A finger has no hover (the tints above are for a mouse only), so a press shows itself: a button or a link
+   dims while held. */
 @media (hover: none) {
   :where(button:not(:disabled), a):active { opacity: 0.6; }
 }

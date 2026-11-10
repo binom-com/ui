@@ -59,11 +59,15 @@ test('base rules are the chat rules, with every hover tint for a mouse only', ()
   const base = read('dist/base.css');
   for (const rule of ["svg.lucide[stroke-width='2'] { stroke-width: 1.65; }", 'input:focus,', '@media (hover: none) {'])
     assert.ok(base.includes(rule), rule);
-  for (const hover of ['button:where(:hover:not(:disabled))', 'button.primary:hover:not(:disabled)', 'a.primary-link:hover']) {
-    const at = base.indexOf(hover);
-    assert.ok(at > 0, hover);
-    assert.ok(base.lastIndexOf('@media (hover: hover) {', at) > base.lastIndexOf('}\n}', at) || base.slice(base.lastIndexOf('@media', at), at).startsWith('@media (hover: hover)'), `${hover} is inside @media (hover: hover)`);
+  // Every `@media (hover: hover) { … }` block (one level of nesting), then what is left outside them.
+  const blocks = [...base.matchAll(/@media \(hover: hover\) \{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]);
+  const outside = base.replace(/@media \(hover: hover\) \{(?:[^{}]|\{[^{}]*\})*\}/g, '');
+  const tints = ['button:where(:hover:not(:disabled))', 'button.primary:hover:not(:disabled)', 'a.primary-link:hover'];
+  for (const tint of tints) {
+    assert.equal(base.split(tint).length - 1, 1, `${tint} appears once`);
+    assert.ok(blocks.some((b) => b.includes(tint)), `${tint} is inside @media (hover: hover)`);
   }
-  // No high-specificity reset that would beat an app's own button colours on touch.
-  assert.ok(!base.includes('background: var(--color-accent); }\n  a.primary-link'), 'no touch hover reset');
+  // Outside those blocks the only hover left is the scrollbar thumb: no bare tint, no touch reset.
+  const bareHovers = outside.match(/[^\s,{}]*:hover[^{,]*/g) ?? [];
+  assert.deepEqual(bareHovers.map((h) => h.trim()), [':hover::-webkit-scrollbar-thumb']);
 });
