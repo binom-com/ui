@@ -7,10 +7,10 @@ Owner: Kirill Stolyarov (design). Values come from chat.binom.com (`binom-com/ch
 ## Install
 
 ```json
-"@binom/ui": "github:binom-com/ui#v0.1.0"
+"@binom/ui": "https://github.com/binom-com/ui/archive/refs/tags/v0.1.1.tar.gz"
 ```
 
-Installed straight from GitHub by tag; no registry. A new version is a new tag: change `v0.1.0` to the new one.
+Installed straight from GitHub by tag; no registry. Use the tag's HTTPS archive, not `github:binom-com/ui#v0.1.0`: npm records a `github:` dependency as `git+ssh`, which fails in build images without git and SSH keys (for example `node:22-slim` on Railway). A new version is a new tag: change the version in the URL.
 
 ## Use
 
@@ -46,6 +46,13 @@ const theme = createTheme(createBinomTheme(mode)); // mode: 'light' | 'dark'
 ```
 
 Keep `data-theme` on `<html>` in step with `mode`, so parts outside MUI that read `tokens.css` match. The theme sets the palette (primary, error, background, text, divider), the font, corners, the 25 elevations from Binom shadows and flat buttons (`disableElevation`); pass your own overrides as a second argument, `createTheme(createBinomTheme(mode), { components })`, not by spreading (a spread replaces Binom's `components`); `secondary`, `info`, `success` and `warning` stay MUI's until Binom defines them. Works as ESM and CommonJS; under `moduleResolution: "node"` types resolve through `typesVersions`.
+
+**Values in code.** For a theme written in code (Material UI style overrides, canvas, charts):
+
+```js
+import { tokens } from '@binom/ui/tokens';
+tokens.light['color-accent']; // '#384c2c'
+```
 
 ## Dark theme
 

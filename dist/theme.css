@@ -247,11 +247,17 @@ button:focus,
 button:focus-visible { outline: none; }
 
 /* `:where` keeps this at a bare `button`'s weight, so every button with a class of its own keeps its hover. */
-button:where(:hover:not(:disabled)) { background: var(--color-button-hover); }
+/* Binom: every hover tint is for a mouse only (chat does this with a build step, hover-only-with-mouse.ts), so a
+   finger's tap never leaves a button in its hover colour. */
+@media (hover: hover) {
+  button:where(:hover:not(:disabled)) { background: var(--color-button-hover); }
+}
 button:disabled { opacity: 0.6; cursor: default; }
 button:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--color-focus-ring); }
 button.primary { background: var(--color-accent); color: var(--color-on-accent); }
-button.primary:hover:not(:disabled) { background: var(--color-accent-hover); }
+@media (hover: hover) {
+  button.primary:hover:not(:disabled) { background: var(--color-accent-hover); }
+}
 /* A press sinks a filled button a little (a menu row or a list row only tints). */
 :is(button.primary, .button--small, .icon-button):active:not(:disabled) { scale: 0.96; }
 /* A see-through accent turns swampy grey: a disabled primary is a plain fill with muted text instead. */
@@ -270,7 +276,9 @@ a.primary-link {
   text-decoration: none;
   transition: background-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard);
 }
-a.primary-link:hover { background: var(--color-accent-hover); }
+@media (hover: hover) {
+  a.primary-link:hover { background: var(--color-accent-hover); }
+}
 a.primary-link:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--color-focus-ring); }
 .button--small {
   min-height: var(--small-control-size);
@@ -344,17 +352,8 @@ input[type='range']::-moz-range-thumb { width: var(--range-knob); height: var(--
   textarea { font-size: max(16px, 1rem) !important; }
 }
 
-/* Touch. A finger has no hover (the build keeps `:hover` for a mouse, see hover-only-with-mouse.ts), so a press
-   shows itself: a row takes the hover tint, any other button or link dims while held. */
+/* Touch. A finger has no hover (the tints above are for a mouse only), so a press shows itself: a button or a link
+   dims while held. */
 @media (hover: none) {
   :where(button:not(:disabled), a):active { opacity: 0.6; }
-}
-
-/* Binom addition (not in chat): on a phone a tap leaves `:hover` stuck on, so the hover fills would stay on a tapped
-   button (chat avoids it with a build step not every app has). Under no hover the fill stays the resting one; the
-   press shows as the Touch dim above. A link styled as the primary gets the same. */
-@media (hover: none) {
-  button:where(:hover:not(:disabled)) { background: var(--color-button); }
-  button.primary:hover:not(:disabled) { background: var(--color-accent); }
-  a.primary-link:hover { background: var(--color-accent); }
 }

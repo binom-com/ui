@@ -55,8 +55,19 @@ test('dist matches a fresh build (nobody edited it by hand)', () => {
   for (const name of readdirSync(fresh)) assert.equal(read(`dist/${name}`), readFileSync(join(fresh, name), 'utf8'), name);
 });
 
-test('base rules are the chat rules plus the touch hover fix', () => {
+test('base rules are the chat rules, with every hover tint for a mouse only', () => {
   const base = read('dist/base.css');
-  for (const rule of ["svg.lucide[stroke-width='2'] { stroke-width: 1.65; }", 'input:focus,', '@media (hover: none) {', 'a.primary-link:hover { background: var(--color-accent); }'])
+  for (const rule of ["svg.lucide[stroke-width='2'] { stroke-width: 1.65; }", 'input:focus,', '@media (hover: none) {'])
     assert.ok(base.includes(rule), rule);
+  // Every `@media (hover: hover) { … }` block (one level of nesting), then what is left outside them.
+  const blocks = [...base.matchAll(/@media \(hover: hover\) \{((?:[^{}]|\{[^{}]*\})*)\}/g)].map((m) => m[1]);
+  const outside = base.replace(/@media \(hover: hover\) \{(?:[^{}]|\{[^{}]*\})*\}/g, '');
+  const tints = ['button:where(:hover:not(:disabled))', 'button.primary:hover:not(:disabled)', 'a.primary-link:hover'];
+  for (const tint of tints) {
+    assert.equal(base.split(tint).length - 1, 1, `${tint} appears once`);
+    assert.ok(blocks.some((b) => b.includes(tint)), `${tint} is inside @media (hover: hover)`);
+  }
+  // Outside those blocks the only hover left is the scrollbar thumb: no bare tint, no touch reset.
+  const bareHovers = outside.match(/[^\s,{}]*:hover[^{,]*/g) ?? [];
+  assert.deepEqual(bareHovers.map((h) => h.trim()), [':hover::-webkit-scrollbar-thumb']);
 });

@@ -122,9 +122,28 @@ const muiDts =
   '/** Material UI 5 theme options from the Binom tokens: `createTheme(createBinomTheme(mode))`. */\n' +
   "export function createBinomTheme(mode?: 'light' | 'dark'): ThemeOptions;\n";
 
+// Every token as a literal per theme, for code that needs values rather than CSS variables (a Material UI theme's
+// style overrides, canvas drawing, charts): `tokens.light['color-accent']` → '#384c2c'. References are resolved.
+const flat = (mode) => {
+  const get = resolved(mode);
+  return Object.fromEntries([...entries('core'), ...entries(mode)].map(([n]) => [n, get(n)]));
+};
+const tokensJson = JSON.stringify({ light: flat('light'), dark: flat('dark') }, null, 2);
+const tokensBanner =
+  HEADER.replace('/*', '//').replace(' */', '') +
+  "/** Binom tokens as literal values per theme: `tokens.light['color-accent']`. Keys are the CSS names without `--`. */\n";
+const tokensJs = tokensBanner + `export const tokens = ${tokensJson};\n`;
+const tokensCjs = tokensBanner + `const tokens = ${tokensJson};\n\nmodule.exports = { tokens };\n`;
+const tokenNames = [...new Set([...entries('core'), ...entries('light')].map(([n]) => n))];
+const tokensDts =
+  `/** A Binom token name: its CSS custom property without \`--\`. */\nexport type BinomToken =\n${tokenNames.map((n) => `  | '${n}'`).join('\n')};\n\n` +
+  '/** Binom tokens as literal values per theme: `tokens.light[\'color-accent\']`. */\n' +
+  'export const tokens: { light: Record<BinomToken, string>; dark: Record<BinomToken, string> };\n';
+
 mkdirSync(out, { recursive: true });
 const files = {
   'tokens.css': tokensCss, 'fonts.css': fontsCss, 'base.css': baseCss, 'theme.css': themeCss,
   'tailwind.css': tailwindCss, 'mui.js': muiJs, 'mui.cjs': muiCjs, 'mui.d.ts': muiDts,
+  'tokens.js': tokensJs, 'tokens.cjs': tokensCjs, 'tokens.d.ts': tokensDts,
 };
 for (const [name, content] of Object.entries(files)) writeFileSync(join(out, name), content);
