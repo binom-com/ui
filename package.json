@@ -11,13 +11,31 @@
     "./fonts.css": "./dist/fonts.css",
     "./base.css": "./dist/base.css",
     "./tailwind.css": "./dist/tailwind.css",
-    "./mui": { "types": "./dist/mui.d.ts", "default": "./dist/mui.js" },
+    "./mui": {
+      "types": "./dist/mui.d.ts",
+      "default": "./dist/mui.js"
+    },
     "./tokens.json": "./tokens/tokens.json"
   },
-  "files": ["dist", "fonts", "tokens"],
+  "files": [
+    "dist",
+    "fonts",
+    "tokens"
+  ],
   "scripts": {
     "build": "node scripts/build.mjs",
     "test": "node --test test/*.test.mjs"
   },
-  "engines": { "node": ">=18" }
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/material": "^5.18.0",
+    "@tailwindcss/cli": "^4.3.5",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwindcss": "^4.3.5"
+  }
 }

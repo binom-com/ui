@@ -49,12 +49,20 @@ const themeCss =
 // Tailwind 4: the light/shared tokens become theme variables (utilities like bg-page, text-muted, rounded-xl,
 // shadow-dialog); `static` emits them all even when no utility uses them, since app CSS reads them too. The dark,
 // pointer and motion blocks stay unlayered so they win over Tailwind's theme layer. Tailwind's own palette is kept.
+// Shadows are the exception: Tailwind copies a shadow's value into its utility, so the dark one would never apply.
+// They stay plain variables and get their own `shadow-*` utilities that read the variable.
 const darkAndRest = strip(tokensCss).slice(strip(tokensCss).indexOf("/* Dark theme"));
 const fontToken = entries('core').find(([n]) => n === 'font')[1].$value;
+const isShadow = ([name]) => name.startsWith('shadow-');
+const lines = (pairs, indent) =>
+  pairs.map(([name, t]) => (t.$description ? `${indent}/* ${t.$description} */\n` : '') + `${indent}--${name}: ${css(t.$value)};`).join('\n');
+const themed = [...entries('core'), ...entries('light')];
 const tailwindCss =
   HEADER + "@import './fonts.css';\n\n" +
-  `@theme static {\n${declarations('core', '  ')}\n${declarations('light', '  ')}\n  --font-sans: ${fontToken};\n}\n\n` +
-  ':root { color-scheme: light; }\n\n' + darkAndRest;
+  `@theme static {\n${lines(themed.filter((e) => !isShadow(e)), '  ')}\n  --font-sans: ${fontToken};\n}\n\n` +
+  `:root {\n${lines(themed.filter(isShadow), '  ')}\n  color-scheme: light;\n}\n\n` +
+  themed.filter(isShadow).map(([name]) => `@utility ${name} {\n  box-shadow: var(--${name});\n}\n`).join('\n') + '\n' +
+  darkAndRest;
 
 // Material UI 5 needs literal colours (it computes alpha and contrast): resolve references per mode.
 function resolved(mode) {

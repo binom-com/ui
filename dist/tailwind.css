@@ -65,15 +65,33 @@
   --color-ai: #6a4bab;
   /* The pressed segment of a segmented switch (System | Light | Dark, All | Groups | Personal). */
   --color-segment-on: #ffffff;
+  --font-sans: 'DM Sans Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+:root {
   --shadow-dialog: 0 16px 48px rgb(32 39 32 / 18%);
   --shadow-popover: 0 8px 24px rgb(32 39 32 / 12%);
   /* Small things floating over the page without a panel's weight: a tooltip, the ⌄ button, the typing pill. */
   --shadow-raised: 0 1px 4px rgb(32 39 32 / 15%);
   --shadow-snackbar: 0 8px 24px rgb(32 39 32 / 16%), 0 1px 3px rgb(32 39 32 / 10%);
-  --font-sans: 'DM Sans Variable', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color-scheme: light;
 }
 
-:root { color-scheme: light; }
+@utility shadow-dialog {
+  box-shadow: var(--shadow-dialog);
+}
+
+@utility shadow-popover {
+  box-shadow: var(--shadow-popover);
+}
+
+@utility shadow-raised {
+  box-shadow: var(--shadow-raised);
+}
+
+@utility shadow-snackbar {
+  box-shadow: var(--shadow-snackbar);
+}
 
 /* Dark theme, picked in the app's settings (`data-theme` on <html>)... */
 :root[data-theme='dark'] {
