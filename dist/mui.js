@@ -55,7 +55,19 @@ const OPTIONS = {
       "0 8px 24px rgb(32 39 32 / 12%)",
       "0 8px 24px rgb(32 39 32 / 12%)",
       "0 16px 48px rgb(32 39 32 / 18%)"
-    ]
+    ],
+    "components": {
+      "MuiButton": {
+        "defaultProps": {
+          "disableElevation": true
+        }
+      },
+      "MuiButtonGroup": {
+        "defaultProps": {
+          "disableElevation": true
+        }
+      }
+    }
   },
   "dark": {
     "palette": {
@@ -109,7 +121,19 @@ const OPTIONS = {
       "0 0 0 1px rgb(232 236 226 / 8%), 0 12px 32px rgb(0 0 0 / 50%)",
       "0 0 0 1px rgb(232 236 226 / 8%), 0 12px 32px rgb(0 0 0 / 50%)",
       "0 0 0 1px rgb(232 236 226 / 10%), 0 24px 64px rgb(0 0 0 / 60%)"
-    ]
+    ],
+    "components": {
+      "MuiButton": {
+        "defaultProps": {
+          "disableElevation": true
+        }
+      },
+      "MuiButtonGroup": {
+        "defaultProps": {
+          "disableElevation": true
+        }
+      }
+    }
   }
 };
 

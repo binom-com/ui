@@ -53,6 +53,12 @@ test('CommonJS build gives the same theme, a fresh object each call', () => {
   assert.equal(createBinomTheme('light').palette.primary.main, '#384c2c');
 });
 
+test('buttons stay flat, as in Binom', () => {
+  const t = createTheme(createBinomTheme('light'));
+  assert.equal(t.components.MuiButton.defaultProps.disableElevation, true);
+  assert.equal(t.components.MuiButtonGroup.defaultProps.disableElevation, true);
+});
+
 test('an unknown mode is refused', () => {
   assert.throws(() => createBinomTheme('sepia'), /unknown mode/);
 });

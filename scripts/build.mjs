@@ -93,11 +93,16 @@ function muiOptions(mode) {
     },
     typography: { fontFamily: t('font') },
     shape: { borderRadius: parseInt(t('radius'), 10) },
-    // MUI's 25 elevations from the Binom shadows: raised for 1–5 (cards, app bar), snackbar for 6–7, popover for
-    // 8–23 (menus, popovers), dialog for 24 (dialogs, drawers).
+    // MUI's 25 elevations from the Binom shadows: raised for 1–5 (paper, app bar), snackbar for 6–7, popover for
+    // 8–23 (menus, popovers, drawers), dialog for 24 (dialogs).
     shadows: Array.from({ length: 25 }, (_, i) =>
       i === 0 ? 'none' : i <= 5 ? t('shadow-raised') : i <= 7 ? t('shadow-snackbar') : i <= 23 ? t('shadow-popover') : t('shadow-dialog'),
     ),
+    // Binom buttons are flat (a fill and a focus ring); MUI's contained buttons would rise on hover and focus.
+    components: {
+      MuiButton: { defaultProps: { disableElevation: true } },
+      MuiButtonGroup: { defaultProps: { disableElevation: true } },
+    },
   };
 }
 const muiOptionsJson = JSON.stringify({ light: muiOptions('light'), dark: muiOptions('dark') }, null, 2);
