@@ -55,8 +55,15 @@ test('dist matches a fresh build (nobody edited it by hand)', () => {
   for (const name of readdirSync(fresh)) assert.equal(read(`dist/${name}`), readFileSync(join(fresh, name), 'utf8'), name);
 });
 
-test('base rules are the chat rules plus the touch hover fix', () => {
+test('base rules are the chat rules, with every hover tint for a mouse only', () => {
   const base = read('dist/base.css');
-  for (const rule of ["svg.lucide[stroke-width='2'] { stroke-width: 1.65; }", 'input:focus,', '@media (hover: none) {', 'a.primary-link:hover { background: var(--color-accent); }'])
+  for (const rule of ["svg.lucide[stroke-width='2'] { stroke-width: 1.65; }", 'input:focus,', '@media (hover: none) {'])
     assert.ok(base.includes(rule), rule);
+  for (const hover of ['button:where(:hover:not(:disabled))', 'button.primary:hover:not(:disabled)', 'a.primary-link:hover']) {
+    const at = base.indexOf(hover);
+    assert.ok(at > 0, hover);
+    assert.ok(base.lastIndexOf('@media (hover: hover) {', at) > base.lastIndexOf('}\n}', at) || base.slice(base.lastIndexOf('@media', at), at).startsWith('@media (hover: hover)'), `${hover} is inside @media (hover: hover)`);
+  }
+  // No high-specificity reset that would beat an app's own button colours on touch.
+  assert.ok(!base.includes('background: var(--color-accent); }\n  a.primary-link'), 'no touch hover reset');
 });
