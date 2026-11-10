@@ -20,15 +20,19 @@ Installed straight from GitHub by tag; no registry. A new version is a new tag: 
 import '@binom/ui/theme.css'; // fonts + tokens + base rules
 ```
 
-**Tailwind 4 (Calendar, Synergy).** In the main stylesheet:
+**Tailwind 4 (Calendar, Synergy).** In the main stylesheet, after `tailwindcss` (before it, Tailwind's defaults win):
 
 ```css
 @import 'tailwindcss';
 @import '@binom/ui/tailwind.css';
-@import '@binom/ui/base.css'; /* optional: Binom's look for bare buttons and fields */
+@import '@binom/ui/base.css' layer(base); /* optional: Binom's look for bare buttons and fields */
 ```
 
-Classes take Binom values: `bg-page`, `bg-bg`, `text-text`, `text-muted`, `border-border`, `bg-accent text-on-accent`, `rounded-xl`, `shadow-dialog`, `font-sans`, `ease-out`. Tailwind's own palette stays available. In Next.js, import the stylesheet in the root layout.
+Keep `layer(base)` on `base.css`: unlayered, its bare `button`/`input` rules would beat every utility class.
+
+Classes take Binom values: `bg-page`, `bg-bg`, `text-text`, `text-muted`, `border-border`, `bg-accent text-on-accent`, `rounded-xl`, `shadow-dialog`, `font-sans`, `ease-out`. Tailwind's own palette stays available. `dark:` follows the same rule as the tokens (`data-theme`, then the system).
+
+Adopting it changes some Tailwind defaults on purpose: bare `rounded` becomes 9px and `rounded-xs/sm/lg/xl` become 4/6/14/16px; `ease-in`/`ease-out` take Binom curves; `font-sans` (and the page font) becomes DM Sans. In Next.js, import the stylesheet in the root layout. Build with the Vite or PostCSS plugin: the bare Tailwind CLI does not rewrite the font URLs.
 
 **Material UI 5 (Meet).**
 
@@ -41,6 +45,8 @@ import '@binom/ui/tokens.css';
 const theme = createTheme(createBinomTheme(mode)); // mode: 'light' | 'dark'
 ```
 
+Keep `data-theme` on `<html>` in step with `mode`, so parts outside MUI that read `tokens.css` match. The theme sets the palette (primary, error, background, text, divider), the font, corners and the 25 elevations from Binom shadows; `secondary`, `info`, `success` and `warning` stay MUI's until Binom defines them. Works as ESM and CommonJS; under `moduleResolution: "node"` types resolve through `typesVersions`.
+
 ## Dark theme
 
 Follows the system by default. An app setting forces a theme with `data-theme="light"` or `data-theme="dark"` on `<html>`.
@@ -50,7 +56,7 @@ Follows the system by default. An app setting forces a theme with `data-theme="l
 The single source is `tokens/tokens.json` (W3C Design Tokens; sets `core`, `light`, `dark`, `pointer-fine`, `reduced-motion`). A token's key is its CSS custom property without `--` (`color-page` → `--color-page`).
 
 - **Change a value:** edit `tokens/tokens.json`, run `npm run build`, commit `dist/` with it. Never edit `dist/` by hand (a test checks it).
-- **Figma:** import `tokens/tokens.json` with the Tokens Studio plugin; `light` and `dark` become modes.
+- **Figma:** import `tokens/tokens.json` with the Tokens Studio plugin; its themes Light (core + light) and Dark (core + dark) become the modes of one Figma Variables collection. Shadows are CSS strings for now.
 - **Your app's own tokens** (for example Ideas' type colours) live in the app, on top of these. Do not redefine Binom tokens in an app.
 
 ## Changes

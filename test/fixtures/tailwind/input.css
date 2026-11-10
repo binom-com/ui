@@ -1,3 +1,4 @@
 @import "tailwindcss";
 @import "../../../dist/tailwind.css";
+@import "../../../dist/base.css" layer(base);
 @source "./index.html";

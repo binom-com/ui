@@ -62,6 +62,12 @@ const tailwindCss =
   `@theme static {\n${lines(themed.filter((e) => !isShadow(e)), '  ')}\n  --font-sans: ${fontToken};\n}\n\n` +
   `:root {\n${lines(themed.filter(isShadow), '  ')}\n  color-scheme: light;\n}\n\n` +
   themed.filter(isShadow).map(([name]) => `@utility ${name} {\n  box-shadow: var(--${name});\n}\n`).join('\n') + '\n' +
+  // `dark:` follows the same rule as the tokens: the app's choice (`data-theme`) first, then the system.
+  "/* Tailwind's `dark:` follows the tokens: `data-theme=\"dark\"` on <html>, or a dark system unless `data-theme=\"light\"`. */\n" +
+  '@custom-variant dark {\n' +
+  "  &:where([data-theme='dark'], [data-theme='dark'] *) {\n    @slot;\n  }\n" +
+  '  @media (prefers-color-scheme: dark) {\n' +
+  "    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {\n      @slot;\n    }\n  }\n}\n\n" +
   darkAndRest;
 
 // Material UI 5 needs literal colours (it computes alpha and contrast): resolve references per mode.
@@ -87,16 +93,25 @@ function muiOptions(mode) {
     },
     typography: { fontFamily: t('font') },
     shape: { borderRadius: parseInt(t('radius'), 10) },
+    // MUI's 25 elevations from the Binom shadows: raised for 1–5 (cards, app bar), snackbar for 6–7, popover for
+    // 8–23 (menus, popovers), dialog for 24 (dialogs, drawers).
+    shadows: Array.from({ length: 25 }, (_, i) =>
+      i === 0 ? 'none' : i <= 5 ? t('shadow-raised') : i <= 7 ? t('shadow-snackbar') : i <= 23 ? t('shadow-popover') : t('shadow-dialog'),
+    ),
   };
 }
-const muiJs =
+const muiOptionsJson = JSON.stringify({ light: muiOptions('light'), dark: muiOptions('dark') }, null, 2);
+const muiBody = (exportFn) =>
   HEADER.replace('/*', '//').replace(' */', '') +
   '/** Material UI 5 theme options from the Binom tokens: `createTheme(createBinomTheme(mode))`. Also import\n' +
-  ' * `@binom/ui/fonts.css` and `@binom/ui/tokens.css` so non-MUI parts read the same tokens. */\n' +
-  `const OPTIONS = ${JSON.stringify({ light: muiOptions('light'), dark: muiOptions('dark') }, null, 2)};\n\n` +
-  "export function createBinomTheme(mode = 'light') {\n" +
+  ' * `@binom/ui/fonts.css` and `@binom/ui/tokens.css`, and keep `data-theme` on <html> in step with `mode`, so\n' +
+  ' * non-MUI parts read the same tokens. A fresh object each call: callers may mutate it. */\n' +
+  `const OPTIONS = ${muiOptionsJson};\n\n` +
+  `${exportFn}(mode = 'light') {\n` +
   "  if (mode !== 'light' && mode !== 'dark') throw new Error(`@binom/ui: unknown mode ${mode}`);\n" +
-  '  return structuredClone(OPTIONS[mode]);\n}\n';
+  '  return JSON.parse(JSON.stringify(OPTIONS[mode]));\n}\n';
+const muiJs = muiBody('export function createBinomTheme');
+const muiCjs = muiBody('function createBinomTheme') + '\nmodule.exports = { createBinomTheme };\n';
 const muiDts =
   "import type { ThemeOptions } from '@mui/material/styles';\n\n" +
   '/** Material UI 5 theme options from the Binom tokens: `createTheme(createBinomTheme(mode))`. */\n' +
@@ -105,6 +120,6 @@ const muiDts =
 mkdirSync(out, { recursive: true });
 const files = {
   'tokens.css': tokensCss, 'fonts.css': fontsCss, 'base.css': baseCss, 'theme.css': themeCss,
-  'tailwind.css': tailwindCss, 'mui.js': muiJs, 'mui.d.ts': muiDts,
+  'tailwind.css': tailwindCss, 'mui.js': muiJs, 'mui.cjs': muiCjs, 'mui.d.ts': muiDts,
 };
 for (const [name, content] of Object.entries(files)) writeFileSync(join(out, name), content);

@@ -51,6 +51,7 @@ test('theme.css is fonts, then tokens, then base rules', () => {
 test('dist matches a fresh build (nobody edited it by hand)', () => {
   const fresh = mkdtempSync(join(tmpdir(), 'binom-ui-'));
   execFileSync(process.execPath, [join(root, 'scripts/build.mjs'), fresh]);
+  assert.deepEqual(readdirSync(join(root, 'dist')).sort(), readdirSync(fresh).sort(), 'no stale or missing files');
   for (const name of readdirSync(fresh)) assert.equal(read(`dist/${name}`), readFileSync(join(fresh, name), 'utf8'), name);
 });
 

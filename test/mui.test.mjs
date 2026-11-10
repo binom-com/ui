@@ -35,6 +35,24 @@ test('no CSS variable reaches Material UI (it computes colours)', () => {
   for (const mode of ['light', 'dark']) assert.ok(walk(createBinomTheme(mode)).every((s) => !s.includes('var(')), mode);
 });
 
+test('elevations come from the Binom shadows, per mode', () => {
+  const light = createTheme(createBinomTheme('light'));
+  assert.equal(light.shadows.length, 25);
+  assert.equal(light.shadows[0], 'none');
+  assert.equal(light.shadows[1], '0 1px 4px rgb(32 39 32 / 15%)');
+  assert.equal(light.shadows[8], '0 8px 24px rgb(32 39 32 / 12%)');
+  assert.equal(light.shadows[24], '0 16px 48px rgb(32 39 32 / 18%)');
+  assert.match(createTheme(createBinomTheme('dark')).shadows[24], /^0 0 0 1px rgb\(232 236 226/);
+});
+
+test('CommonJS build gives the same theme, a fresh object each call', () => {
+  const cjs = createRequire(import.meta.url)('../dist/mui.cjs');
+  assert.deepEqual(cjs.createBinomTheme('dark'), createBinomTheme('dark'));
+  const a = createBinomTheme('light');
+  a.palette.primary.main = 'red';
+  assert.equal(createBinomTheme('light').palette.primary.main, '#384c2c');
+});
+
 test('an unknown mode is refused', () => {
   assert.throws(() => createBinomTheme('sepia'), /unknown mode/);
 });

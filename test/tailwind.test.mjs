@@ -16,6 +16,7 @@ const rule = (selector) => new RegExp(`\\${selector} \\{\\s*([^}]*)\\}`).exec(bu
 test('Binom classes read the Binom tokens', () => {
   assert.equal(rule('.bg-page'), 'background-color: var(--color-page);');
   assert.equal(rule('.text-muted'), 'color: var(--color-muted);');
+  assert.equal(rule('.text-text'), 'color: var(--color-text);');
   assert.equal(rule('.rounded-xl'), 'border-radius: var(--radius-xl);');
   assert.equal(rule('.font-sans'), 'font-family: var(--font-sans);');
 });
@@ -34,4 +35,18 @@ test('light values in the theme, dark values under both dark selectors', () => {
   assert.match(dark, /--color-page: #141814;/);
   const system = built.slice(built.indexOf('@media (prefers-color-scheme: dark)'));
   assert.match(system, /:root:not\(\[data-theme='light'\]\) \{[^}]*--color-page: #141814;/);
+});
+
+test('dark: follows data-theme and the system, like the tokens', () => {
+  assert.ok(built.includes(".dark\\:bg-accent:where([data-theme='dark'], [data-theme='dark'] *) {"));
+  assert.match(built, /@media \(prefers-color-scheme: dark\) \{\s*\.dark\\:bg-accent:where\(:root:not\(\[data-theme='light'\]\), :root:not\(\[data-theme='light'\]\) \*\)/);
+});
+
+test('base.css in layer(base) leaves utility classes in charge of buttons', () => {
+  // The layer order is declared once (theme, base, components, utilities), so base rules lose to utilities wherever
+  // they appear in the file; check the bare button rule sits in a base layer, not unlayered.
+  const buttonRule = built.indexOf('min-height: var(--tap-size)');
+  const before = built.slice(0, buttonRule);
+  assert.match(built, /^@layer theme, base, components, utilities;/m);
+  assert.ok(before.lastIndexOf('@layer base {') > before.lastIndexOf('\n}\n'), 'button rules are inside @layer base');
 });

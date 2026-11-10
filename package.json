@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Binom design system: tokens, fonts and base rules for every Binom app (plain CSS, Tailwind 4, Material UI 5).",
   "type": "module",
+  "private": false,
   "license": "MIT",
   "repository": "github:binom-com/ui",
   "exports": {
@@ -13,9 +14,12 @@
     "./tailwind.css": "./dist/tailwind.css",
     "./mui": {
       "types": "./dist/mui.d.ts",
+      "import": "./dist/mui.js",
+      "require": "./dist/mui.cjs",
       "default": "./dist/mui.js"
     },
-    "./tokens.json": "./tokens/tokens.json"
+    "./tokens.json": "./tokens/tokens.json",
+    "./package.json": "./package.json"
   },
   "files": [
     "dist",
@@ -37,5 +41,12 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwindcss": "^4.3.5"
+  },
+  "typesVersions": {
+    "*": {
+      "mui": [
+        "dist/mui.d.ts"
+      ]
+    }
   }
 }

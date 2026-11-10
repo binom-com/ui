@@ -93,6 +93,18 @@
   box-shadow: var(--shadow-snackbar);
 }
 
+/* Tailwind's `dark:` follows the tokens: `data-theme="dark"` on <html>, or a dark system unless `data-theme="light"`. */
+@custom-variant dark {
+  &:where([data-theme='dark'], [data-theme='dark'] *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+      @slot;
+    }
+  }
+}
+
 /* Dark theme, picked in the app's settings (`data-theme` on <html>)... */
 :root[data-theme='dark'] {
   --color-page: #141814;
