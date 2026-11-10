@@ -1,0 +1,23 @@
+{
+  "name": "@binom/ui",
+  "version": "0.1.0",
+  "description": "Binom design system: tokens, fonts and base rules for every Binom app (plain CSS, Tailwind 4, Material UI 5).",
+  "type": "module",
+  "license": "MIT",
+  "repository": "github:binom-com/ui",
+  "exports": {
+    "./theme.css": "./dist/theme.css",
+    "./tokens.css": "./dist/tokens.css",
+    "./fonts.css": "./dist/fonts.css",
+    "./base.css": "./dist/base.css",
+    "./tailwind.css": "./dist/tailwind.css",
+    "./mui": { "types": "./dist/mui.d.ts", "default": "./dist/mui.js" },
+    "./tokens.json": "./tokens/tokens.json"
+  },
+  "files": ["dist", "fonts", "tokens"],
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": { "node": ">=18" }
+}
